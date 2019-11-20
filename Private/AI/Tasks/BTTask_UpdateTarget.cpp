@@ -6,6 +6,7 @@
 #include "Engine.h"
 #include "AI/AIInterface.h"
 #include "SlenderCharacter.h"
+#include "Public/AI/SlenderAICharacter.h"
 #include "BehaviorTree/BlackboardComponent.h"
 
 
@@ -23,29 +24,37 @@ EBTNodeResult::Type UBTTask_UpdateTarget::ExecuteTask(UBehaviorTreeComponent& Ow
 	{
 		if (OwnerComp.GetAIOwner()->GetPawn() != nullptr)
 		{
-			if (!IAIInterface::Execute_GetIsDead(OwnerComp.GetAIOwner()->GetPawn()) && IAIInterface::Execute_GetIsHunting(OwnerComp.GetAIOwner()->GetPawn()))
+			if (FailIfNotOverwatchMode ? IAIInterface::Execute_GetAIType(OwnerComp.GetAIOwner()->GetPawn()) == EAITypeEnum::EAIT_Overwatch : true)
 			{
-				auto pawn = OwnerComp.GetAIOwner()->GetPawn();
-
-				auto target = IAIInterface::Execute_GetClosestTargetOnAllMap(pawn, ASlenderCharacter::StaticClass());
-				if (target != nullptr)
+				if (!IAIInterface::Execute_GetIsDead(OwnerComp.GetAIOwner()->GetPawn()) && IAIInterface::Execute_GetIsHunting(OwnerComp.GetAIOwner()->GetPawn()))
 				{
-					if (OwnerComp.GetBlackboardComponent()->GetValueAsObject(Target.SelectedKeyName) != target)
+
+					auto pawn = OwnerComp.GetAIOwner()->GetPawn();
+
+					auto target = IAIInterface::Execute_GetClosestTargetOnAllMap(pawn, ASlenderCharacter::StaticClass());
+					if (target != nullptr)
 					{
-						OwnerComp.GetBlackboardComponent()->SetValueAsObject(Target.SelectedKeyName, target);
+						if (OwnerComp.GetBlackboardComponent()->GetValueAsObject(Target.SelectedKeyName) != target)
+						{
+							OwnerComp.GetBlackboardComponent()->SetValueAsObject(Target.SelectedKeyName, target);
+						}
 					}
+					else
+					{
+
+					}
+					return EBTNodeResult::Type::Succeeded;
 				}
 				else
 				{
-					
+					OwnerComp.GetBlackboardComponent()->ClearValue(Target.SelectedKeyName);
+
+					return EBTNodeResult::Type::Succeeded;
 				}
-				return EBTNodeResult::Type::Succeeded;
 			}
 			else
 			{
-				OwnerComp.GetBlackboardComponent()->ClearValue(Target.SelectedKeyName);
-				
-				return EBTNodeResult::Type::Succeeded;
+				return EBTNodeResult::Type::Failed;
 			}
 		}
 		else
@@ -56,7 +65,7 @@ EBTNodeResult::Type UBTTask_UpdateTarget::ExecuteTask(UBehaviorTreeComponent& Ow
 	else
 	{
 		if (GEngine) { GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Red, TEXT("No controller")); }
-
+		return EBTNodeResult::Type::Failed;
 	}
 	return EBTNodeResult::Type::Failed;
 }

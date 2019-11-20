@@ -13,6 +13,8 @@
 #include "FMODBlueprintStatics.h"
 #include "SlenderAICharacter.generated.h"
 
+
+
 UCLASS()
 class /*SLENDER_API*/ ASlenderAICharacter : public ACharacter, public IAIInterface
 {
@@ -100,6 +102,9 @@ public:
 
 	FTimerHandle TeleportUpdateTimer;
 
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+		EAITypeEnum AIType = EAITypeEnum::EAIT_Overwatch;
+
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Sound)
 		UFMODEvent* HuntingMusic;
 		
@@ -129,6 +134,36 @@ public:
 	/**Points that slender teleports to at random if not hunting*/
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Hunting, Replicated)
 		TArray<AMovementPoint*>TeleportPoints;
+
+
+	/**Points that slender walks to if not hunting*/
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Patroling, Replicated)
+		TArray<AMovementPoint*>PatrolPoints;
+
+	/**Points that slender walks to if not hunting*/
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Patroling, Replicated)
+		int PatrolNodeId = 0;
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+		int GetCurrentPatrolId();
+
+	int GetCurrentPatrolId_Implementation() { return PatrolNodeId; }
+
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+		void SetCurrentPatrolId(int id);
+
+	void SetCurrentPatrolId_Implementation(int id) { PatrolNodeId = id; }
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+		TArray<AMovementPoint*> GetPatrolPoints();
+
+	TArray<AMovementPoint*> GetPatrolPoints_Implementation() { return PatrolPoints; }
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+		EAITypeEnum GetAIType();
+
+	EAITypeEnum GetAIType_Implementation() { return AIType; }
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Hunting, Replicated)
 		float TimeBetweenTeleports = 5.f;

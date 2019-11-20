@@ -4,7 +4,16 @@
 
 #include "CoreMinimal.h"
 #include "UObject/Interface.h"
+#include  "Public/AI/MovementPoint.h"
 #include "AIInterface.generated.h"
+
+
+UENUM(BlueprintType)
+enum class EAITypeEnum :uint8
+{
+	EAIT_Overwatch UMETA(DisplayName = "Overwatch"),
+	EAIT_Patrol UMETA(DisplayName = "Patrol")
+};
 
 // This class does not need to be modified.
 UINTERFACE(MinimalAPI)
@@ -55,4 +64,17 @@ public:
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 		float GetMinSenseDistance();
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+		int GetCurrentPatrolId();
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+		void SetCurrentPatrolId(int id);
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+		TArray<AMovementPoint*> GetPatrolPoints();
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+		EAITypeEnum GetAIType();
+
 };

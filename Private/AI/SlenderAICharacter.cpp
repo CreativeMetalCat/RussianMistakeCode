@@ -234,5 +234,8 @@ void ASlenderAICharacter::GetLifetimeReplicatedProps(TArray< FLifetimeProperty >
 
 	DOREPLIFETIME(ASlenderAICharacter, TimeSinceLastNoteCollection);
 	DOREPLIFETIME(ASlenderAICharacter, MaxTimeForCollectingNotes);
+
+	DOREPLIFETIME(ASlenderAICharacter, PatrolPoints);
+	DOREPLIFETIME(ASlenderAICharacter, PatrolNodeId);
 	
 }
