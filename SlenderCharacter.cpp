@@ -419,8 +419,9 @@ void ASlenderCharacter::Use()
 		FCollisionQueryParams params = FCollisionQueryParams::DefaultQueryParam;
 		params.AddIgnoredActor(this);
 
-		this->GetWorld()->LineTraceSingleByChannel(hit, FVector(0, 0, 70)  + GetActorLocation(), GetActorLocation() + FVector(0, 0, 70) + GetFirstPersonCameraComponent()->GetForwardVector() * 500, ECollisionChannel::ECC_Visibility, params);
+		this->GetWorld()->LineTraceSingleByChannel(hit, FVector(0, 0, bHidding ? 0 : 70) + GetActorLocation(), GetActorLocation() + FVector(0, 0, 70) + GetFirstPersonCameraComponent()->GetForwardVector() * 500, ECollisionChannel::ECC_Visibility, params);
 
+		/*DrawDebugLine(GetWorld(), FVector(0, 0, bHidding ? 0 : 70) + GetActorLocation(), GetActorLocation() + FVector(0, 0, 70) + GetFirstPersonCameraComponent()->GetForwardVector() * 500, FColor::Red, true);*/
 		if (hit.bBlockingHit)
 		{
 			if (hit.Actor != nullptr)
@@ -551,6 +552,11 @@ void ASlenderCharacter::TurnAtRate(float Rate)
 		// calculate delta for this frame from the rate information
 		AddControllerYawInput(Rate * BaseTurnRate * GetWorld()->GetDeltaSeconds());
 	}
+	if (CameraLimitsInfo.bSupposedToLimit && CameraLimitsInfo.bLimitYaw)
+	{
+		GetController()->SetControlRotation(FRotator(GetControlRotation().Pitch, FMath::ClampAngle(GetControlRotation().Yaw, CameraLimitsInfo.MaxYaw, CameraLimitsInfo.MinYaw), GetControlRotation().Roll));
+	}
+
 }
 
 void ASlenderCharacter::LookUpAtRate(float Rate)
@@ -559,6 +565,11 @@ void ASlenderCharacter::LookUpAtRate(float Rate)
 	{
 		// calculate delta for this frame from the rate information
 		AddControllerPitchInput(Rate * BaseLookUpRate * GetWorld()->GetDeltaSeconds());
+	}
+
+	if (CameraLimitsInfo.bSupposedToLimit && CameraLimitsInfo.bLimitPitch)
+	{
+		GetController()->SetControlRotation(FRotator(FMath::ClampAngle(GetControlRotation().Pitch, CameraLimitsInfo.MaxPitch, CameraLimitsInfo.MinPitch), GetControlRotation().Yaw, GetControlRotation().Roll));
 	}
 }
 
@@ -623,11 +634,19 @@ void ASlenderCharacter::GetLifetimeReplicatedProps(TArray< FLifetimeProperty >& 
 	DOREPLIFETIME(ASlenderCharacter, bAllowedToUseFlashLight);
 
 	DOREPLIFETIME(ASlenderCharacter, FootstepTimerHandle);
+
+	DOREPLIFETIME(ASlenderCharacter, bHidding);
 }
 
 bool ASlenderCharacter::CanUseFlashlight_Implementation()
 {
 	return (UsedFlashlightTime < MaxFlashlightTime && bAllowedToUseFlashLight);
+}
+
+void ASlenderCharacter::SetAllowedControl_Implementation(bool allowCamera, bool allowMovement)
+{
+	GetController()->SetIgnoreLookInput(!allowCamera);
+	GetController()->SetIgnoreMoveInput(!allowMovement);
 }
 
 void ASlenderCharacter::CheckFlashlight_Implementation(void)

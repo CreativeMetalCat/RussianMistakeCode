@@ -13,6 +13,44 @@
 #include "SlenderCharacter.generated.h"
 
 
+USTRUCT(BlueprintType)
+struct FCameraLimitsInfo
+{
+	GENERATED_BODY();
+public:
+
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+		bool bSupposedToLimit = false;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+		bool bLimitRoll = false;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+		bool bLimitPitch = false;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+		bool bLimitYaw = false;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+		float MaxRoll = 180;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+		float MinRoll = -180;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+		float MaxPitch = -10;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+		float MinPitch = 10;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+		float MaxYaw = -180;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+		float MinYaw = 0;
+};
+
 class UInputComponent;
 
 UCLASS(config=Game)
@@ -50,6 +88,13 @@ protected:
 public:
 	virtual void OnConstruction(const FTransform& Transform) override;
 
+	UFUNCTION(BlueprintCallable)
+		void ForceCrouch() { bIsCrouched = true; }
+
+	UFUNCTION(BlueprintCallable)
+		void ForceUnCrouch() { bIsCrouched = false; }
+
+
 
 	UFUNCTION(BlueprintCallable)
 		void StartCrouching();
@@ -69,6 +114,11 @@ public:
 		bool CanUseFlashlight();
 
 	bool CanUseFlashlight_Implementation();
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+		void SetAllowedControl(bool allowCamera = true, bool allowMovement = true);
+
+	void SetAllowedControl_Implementation(bool allowCamera = true, bool allowMovement = true);
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 		void CheckFlashlight();
@@ -150,8 +200,9 @@ public:
 	FTimerHandle FlashLightUpdateTimer;
 
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Hidding, Replicated)
+		FCameraLimitsInfo CameraLimitsInfo;
 
-	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Flashlight, Replicated)
 		bool bAllowedToUseFlashLight = true;
 
@@ -190,6 +241,9 @@ public:
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Replicated)
 		bool CanMove = true;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Replicated)
+		bool bHidding = false;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Replicated)
 		bool CanRotate = true;

@@ -24,7 +24,7 @@ EBTNodeResult::Type UBTTask_UpdateTarget::ExecuteTask(UBehaviorTreeComponent& Ow
 	{
 		if (OwnerComp.GetAIOwner()->GetPawn() != nullptr)
 		{
-			if (FailIfNotOverwatchMode ? IAIInterface::Execute_GetAIType(OwnerComp.GetAIOwner()->GetPawn()) == EAITypeEnum::EAIT_Overwatch : true)
+			if ((FailIfNotOverwatchMode ? IAIInterface::Execute_GetAIType(OwnerComp.GetAIOwner()->GetPawn()) == EAITypeEnum::EAIT_Overwatch : true) || IAIInterface::Execute_GetIsHunting(OwnerComp.GetAIOwner()->GetPawn()))
 			{
 				if (!IAIInterface::Execute_GetIsDead(OwnerComp.GetAIOwner()->GetPawn()) && IAIInterface::Execute_GetIsHunting(OwnerComp.GetAIOwner()->GetPawn()))
 				{
