@@ -28,4 +28,6 @@ public:
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 		bool RequestPlayfootstepSound();
+
+
 };

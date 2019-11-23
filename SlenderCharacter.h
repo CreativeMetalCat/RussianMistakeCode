@@ -10,51 +10,17 @@
 #include "Public/Multiplayer/MultiplayerInterface.h"
 #include "Public/GameSave.h"
 #include "GameFramework/SpringArmComponent.h"
+#include "Public/PlayerInteractions.h"
+#include "Public/CameraLimitsInfo.h"
 #include "SlenderCharacter.generated.h"
 
 
-USTRUCT(BlueprintType)
-struct FCameraLimitsInfo
-{
-	GENERATED_BODY();
-public:
 
-
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-		bool bSupposedToLimit = false;
-
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-		bool bLimitRoll = false;
-
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-		bool bLimitPitch = false;
-
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-		bool bLimitYaw = false;
-
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-		float MaxRoll = 180;
-
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-		float MinRoll = -180;
-
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-		float MaxPitch = -10;
-
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-		float MinPitch = 10;
-
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-		float MaxYaw = -180;
-
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-		float MinYaw = 0;
-};
 
 class UInputComponent;
 
 UCLASS(config=Game)
-class ASlenderCharacter : public ACharacter,public IAIInterface, public  IMultiplayerInterface
+class ASlenderCharacter : public ACharacter,public IAIInterface, public  IMultiplayerInterface,public IPlayerInteractions
 {
 	GENERATED_BODY()
 
@@ -87,14 +53,6 @@ protected:
 
 public:
 	virtual void OnConstruction(const FTransform& Transform) override;
-
-	UFUNCTION(BlueprintCallable)
-		void ForceCrouch() { bIsCrouched = true; }
-
-	UFUNCTION(BlueprintCallable)
-		void ForceUnCrouch() { bIsCrouched = false; }
-
-
 
 	UFUNCTION(BlueprintCallable)
 		void StartCrouching();
@@ -147,6 +105,40 @@ public:
 
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
 		bool PlayFootstepSound();
+
+	//Player Interactions -- BEGIN
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+		bool IsHidding();
+
+	bool IsHidding_Implementation() { return bHidding; }
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+		void SetIsHidding(bool hidding);
+
+	void SetIsHidding_Implementation(bool hidding) { bHidding = hidding; }
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+		void ForceCrouch();
+
+	void ForceCrouch_Implementation() { bIsCrouched = true; };
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+		void ForceUnCrouch();
+
+	void ForceUnCrouch_Implementation(){ bIsCrouched = false; }
+
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+		void SetCameraLimitations(FCameraLimitsInfo info);
+
+	void SetCameraLimitations_Implementation(FCameraLimitsInfo info) { CameraLimitsInfo = info; }
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+		FCameraLimitsInfo GetCameraLimitations();
+
+	FCameraLimitsInfo GetCameraLimitations_Implementation() { return  CameraLimitsInfo; }
+
+	//Player Interactions -- END
 
 	bool PlayFootstepSound_Implementation() { return false; }
 
