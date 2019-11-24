@@ -28,7 +28,22 @@ public:
 		FVector RelativeHiddingPosition = FVector(0, 5, 90);
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
-		void OnInteraction(AActor* interactor);
+		void OnInteraction(AActor* interactor, UPrimitiveComponent* interactedComponent);
 
-	void OnInteraction_Implementation(AActor* interactor);
+	void OnInteraction_Implementation(AActor* interactor, UPrimitiveComponent* interactedComponent);
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+		bool CanHide(AActor* interactor, UPrimitiveComponent* interactedComponent);
+
+	bool CanHide_Implementation(AActor* interactor, UPrimitiveComponent* interactedComponent) { return true; }
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+		void PlayStartHiddingEffects();
+
+	void PlayStartHiddingEffects_Implementation() {}
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+		void PlayStopHiddingEffects();
+
+		void PlayStopHiddingEffects_Implementation() {}
 };

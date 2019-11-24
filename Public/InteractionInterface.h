@@ -24,7 +24,7 @@ class SLENDER_API IInteractionInterface
 public:
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
-		void OnInteraction(AActor*interactor);
+		void OnInteraction(AActor*interactor,UPrimitiveComponent*interactedComponent);
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 		bool RequestPlayfootstepSound();

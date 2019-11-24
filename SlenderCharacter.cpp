@@ -429,7 +429,7 @@ void ASlenderCharacter::Use()
 				IInteractionInterface* interface = Cast<IInteractionInterface>(hit.GetActor());
 				if (interface)
 				{
-					IInteractionInterface::Execute_OnInteraction(hit.GetActor(), this);
+					IInteractionInterface::Execute_OnInteraction(hit.GetActor(), this, hit.GetComponent());
 				}
 			}
 			else if (hit.Component != nullptr)

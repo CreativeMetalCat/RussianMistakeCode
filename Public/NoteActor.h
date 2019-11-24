@@ -32,7 +32,7 @@ public:
 
 	/**Must be called in blueprint on OnInteraction */
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
-		void OnInteractionServer(AActor* interactor);
+		void OnInteractionServer(AActor* interactor, UPrimitiveComponent* interactedComponent);
 
-	void OnInteractionServer_Implementation(AActor* interactor);
+	void OnInteractionServer_Implementation(AActor* interactor, UPrimitiveComponent* interactedComponent);
 };
