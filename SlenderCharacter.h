@@ -10,13 +10,17 @@
 #include "Public/Multiplayer/MultiplayerInterface.h"
 #include "Public/GameSave.h"
 #include "GameFramework/SpringArmComponent.h"
+#include "Public/PlayerInteractions.h"
+#include "Public/CameraLimitsInfo.h"
 #include "SlenderCharacter.generated.h"
+
+
 
 
 class UInputComponent;
 
 UCLASS(config=Game)
-class ASlenderCharacter : public ACharacter,public IAIInterface, public  IMultiplayerInterface
+class ASlenderCharacter : public ACharacter,public IAIInterface, public  IMultiplayerInterface,public IPlayerInteractions
 {
 	GENERATED_BODY()
 
@@ -50,7 +54,6 @@ protected:
 public:
 	virtual void OnConstruction(const FTransform& Transform) override;
 
-
 	UFUNCTION(BlueprintCallable)
 		void StartCrouching();
 
@@ -69,6 +72,11 @@ public:
 		bool CanUseFlashlight();
 
 	bool CanUseFlashlight_Implementation();
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+		void SetAllowedControl(bool allowCamera = true, bool allowMovement = true);
+
+	void SetAllowedControl_Implementation(bool allowCamera = true, bool allowMovement = true);
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 		void CheckFlashlight();
@@ -97,6 +105,40 @@ public:
 
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
 		bool PlayFootstepSound();
+
+	//Player Interactions -- BEGIN
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+		bool IsHidding();
+
+	bool IsHidding_Implementation() { return bHidding; }
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+		void SetIsHidding(bool hidding);
+
+	void SetIsHidding_Implementation(bool hidding) { bHidding = hidding; }
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+		void ForceCrouch();
+
+	void ForceCrouch_Implementation() { bIsCrouched = true; };
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+		void ForceUnCrouch();
+
+	void ForceUnCrouch_Implementation(){ bIsCrouched = false; }
+
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+		void SetCameraLimitations(FCameraLimitsInfo info);
+
+	void SetCameraLimitations_Implementation(FCameraLimitsInfo info) { CameraLimitsInfo = info; }
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+		FCameraLimitsInfo GetCameraLimitations();
+
+	FCameraLimitsInfo GetCameraLimitations_Implementation() { return  CameraLimitsInfo; }
+
+	//Player Interactions -- END
 
 	bool PlayFootstepSound_Implementation() { return false; }
 
@@ -150,8 +192,9 @@ public:
 	FTimerHandle FlashLightUpdateTimer;
 
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Hidding, Replicated)
+		FCameraLimitsInfo CameraLimitsInfo;
 
-	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Flashlight, Replicated)
 		bool bAllowedToUseFlashLight = true;
 
@@ -190,6 +233,9 @@ public:
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Replicated)
 		bool CanMove = true;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Replicated)
+		bool bHidding = false;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Replicated)
 		bool CanRotate = true;

@@ -4,26 +4,24 @@
 
 #include "CoreMinimal.h"
 #include "BehaviorTree/BTTaskNode.h"
-#include "BTTask_UpdateTarget.generated.h"
+#include "BTTask_GetNextPatrolNode.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class SLENDER_API UBTTask_UpdateTarget : public UBTTaskNode
+class SLENDER_API UBTTask_GetNextPatrolNode : public UBTTaskNode
 {
 	GENERATED_BODY()
-
+	
 public:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-		FBlackboardKeySelector Target;
-
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-		bool FailIfNotOverwatchMode = false;
+		FBlackboardKeySelector ReslutKey;
 
 	virtual void TickTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, float DeltaSeconds) override;
 
 	virtual void OnGameplayTaskActivated(UGameplayTask& Task) override;
 
 	virtual EBTNodeResult::Type ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory)override;
+
 };

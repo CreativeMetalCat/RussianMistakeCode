@@ -144,9 +144,9 @@ public:
 	void StopMovement_Implementation();
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
-		void OnInteraction(AActor* interactor);
+		void OnInteraction(AActor* interactor, UPrimitiveComponent* interactedComponent);
 
-	virtual void OnInteraction_Implementation(AActor* interactor) override;
+	virtual void OnInteraction_Implementation(AActor* interactor, UPrimitiveComponent* interactedComponent) override;
 
 	virtual void BeginPlay()override;
 };

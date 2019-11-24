@@ -141,7 +141,7 @@ void AMovingPlatform::StopMovement_Implementation()
 	OnStopMovementDelegate.Broadcast(bOpened);
 }
 
-void AMovingPlatform::OnInteraction_Implementation(AActor* interactor)
+void AMovingPlatform::OnInteraction_Implementation(AActor* interactor, UPrimitiveComponent* interactedComponent)
 {
 	if (CanUse(interactor)) 
 	{

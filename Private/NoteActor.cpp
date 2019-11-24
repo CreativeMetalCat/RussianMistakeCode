@@ -8,7 +8,7 @@
 #include "Public/GlobalInteractions.h"
 #include "Kismet/GameplayStatics.h"
 
-void ANoteActor::OnInteractionServer_Implementation(AActor* interactor)
+void ANoteActor::OnInteractionServer_Implementation(AActor* interactor, UPrimitiveComponent* interactedComponent)
 {
 	if (Cast<ASlenderCharacter>(interactor) != nullptr)
 	{
