@@ -26,7 +26,7 @@ void AHiddingPlaceBase::OnInteraction_Implementation(AActor* interactor, UPrimit
 
 			PlayStartHiddingEffects();
 		}
-		else
+		else if (IPlayerInteractions::Execute_IsHidding(interactor))
 		{
 			interactor->SetActorLocation(StepOutToPosition + GetActorLocation());
 			interactor->SetActorEnableCollision(true);

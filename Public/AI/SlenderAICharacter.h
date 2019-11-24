@@ -11,6 +11,8 @@
 #include  "Public/AI/MovementPoint.h"
 #include "FMODEvent.h"
 #include "FMODBlueprintStatics.h"
+#include "Perception/AIPerceptionComponent.h"
+#include "Perception/AISenseConfig_Sight.h"
 #include "SlenderAICharacter.generated.h"
 
 
@@ -29,6 +31,31 @@ protected:
 	virtual void BeginPlay() override;
 
 public:
+	//--perception--begin
+
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+		TArray<TSubclassOf<ACharacter>>EnemyClasses;
+
+
+	UPROPERTY(BlueprintReadOnly, EditAnywhere)
+		float SightRange = 3000.f;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	FTimerHandle SenseUpdateTimerHandle;
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+		void UpdateSight(UAIPerceptionComponent* Perception);
+
+	void UpdateSight_Implementation(UAIPerceptionComponent* Perception);
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+		void UpdateSense();
+
+	void UpdateSense_Implementation() { }
+
+	//--perception--end
+
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 		AActor* GetClosestTarget(TSubclassOf<AActor> targetClass, float maxDistance, float minDistance);
@@ -40,6 +67,8 @@ public:
 		FName GetBlackboardTargetValueName();
 
 	FName GetBlackboardTargetValueName_Implementation()override { return BlackboardTargetValueName; }
+
+	
 
 	/**just gets the closest charcter*/
 	UFUNCTION(BlueprintCallable)

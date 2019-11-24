@@ -60,6 +60,9 @@ public:
 		bool BeKilled();
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+		bool CheckLocation();
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 		float GetMaxSenseDistance();
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)

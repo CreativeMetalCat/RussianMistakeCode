@@ -8,6 +8,9 @@
 #include "Kismet/KismetMathLibrary.h"
 #include "BehaviorTree/BlackboardComponent.h"
 
+#include "Public/PlayerInteractions.h"
+
+
 // Sets default values
 ASlenderAICharacter::ASlenderAICharacter()
 {
@@ -20,9 +23,10 @@ ASlenderAICharacter::ASlenderAICharacter()
 void ASlenderAICharacter::BeginPlay()
 {
 	Super::BeginPlay();
-	
 	GetWorldTimerManager().SetTimer(HuntUpdateTimer, this, &ASlenderAICharacter::ShouldStartHunt, 0.01f, true);
 	GetWorldTimerManager().SetTimer(TeleportUpdateTimer, this, &ASlenderAICharacter::TeleportAround , 0.01f, true);
+
+	GetWorldTimerManager().SetTimer(SenseUpdateTimerHandle, this, &ASlenderAICharacter::UpdateSense, 0.1f, true);
 }
 
 // Called every frame
@@ -80,6 +84,53 @@ void ASlenderAICharacter::SetupPlayerInputComponent(UInputComponent* PlayerInput
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 	
+}
+
+void ASlenderAICharacter::UpdateSight_Implementation(UAIPerceptionComponent* Perception)
+{
+	/*if (GEngine) { GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Red, Perception->GetFName().ToString()); }*/
+	TArray<AActor*>actors;
+	Perception->GetCurrentlyPerceivedActors(UAISense_Sight::StaticClass(), actors);
+	if (actors.Num() > 0)
+	{
+		if (GetController() != nullptr)
+		{
+			if (UAIBlueprintHelperLibrary::GetBlackboard(this)->GetValueAsObject("Player") != nullptr)
+			{
+				for (int i = 0; i < actors.Num(); i++)
+				{
+					if (UAIBlueprintHelperLibrary::GetBlackboard(this)->GetValueAsObject("Player") == actors[i])
+					{
+						/*actor is still visible*/
+						UAIBlueprintHelperLibrary::GetBlackboard(this)->SetValueAsVector("LastKnownLocation", actors[i]->GetActorLocation());
+						return;
+					}
+				}
+				UAIBlueprintHelperLibrary::GetBlackboard(this)->ClearValue("Player");
+			}
+			//can't see anymore or haven't seen yet
+			if (EnemyClasses.Num() > 0)
+			{
+				for (int i = 0; i < actors.Num(); i++)
+				{
+					for (int a = 0; a < EnemyClasses.Num(); a++)
+					{
+						if (actors[i]->GetClass()->IsChildOf(EnemyClasses[a]) || actors[i]->GetClass() == EnemyClasses[a]) 
+						{
+							if (!IPlayerInteractions::Execute_IsHidding(actors[i])&& !IAIInterface::Execute_GetIsDead(actors[i]))
+							{
+								UAIBlueprintHelperLibrary::GetBlackboard(this)->SetValueAsObject("Player", actors[i]);
+								UAIBlueprintHelperLibrary::GetBlackboard(this)->SetValueAsBool("CanSeeTarget", true);
+								return;
+							}
+						}
+					}
+				}
+			}
+			UAIBlueprintHelperLibrary::GetBlackboard(this)->SetValueAsBool("CanSeeTarget", false);
+
+		}
+	}
 }
 
 AActor* ASlenderAICharacter::GetClosestTarget_Implementation(TSubclassOf<AActor> targetClass, float maxDistance = 2000, float minDistance = 0)
