@@ -124,7 +124,7 @@ public:
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 		void StopHunt();
 
-	void StopHunt_Implementation() { WasLookedAtFor = 0; IsHunting = false; }
+	void StopHunt_Implementation();
 
 	
 	FTimerHandle HuntUpdateTimer;
@@ -159,6 +159,12 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Hunting, Replicated)
 		float WasLookedAtFor = 0.f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Movement, Replicated)
+		float DefaultMovementSpeed = 200.f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Movement, Replicated)
+		float HuntingMovementSpeed = 600.f;
 
 	/**Points that slender teleports to at random if not hunting*/
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Hunting, Replicated)
@@ -206,11 +212,17 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Hunting, Replicated)
 		float MaxTimeForCollectingNotes = 30.f;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Replicated)
-		USoundBase* AttackSound;
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Sound)
+		UFMODEvent* AttackSound;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Replicated)
-		USoundBase* TeleportSound;
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Sound, Replicated)
+		FFMODEventInstance AttackSoundInstance;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Sound)
+		UFMODEvent* TeleportSound;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Sound, Replicated)
+		FFMODEventInstance TeleportSoundInstance;
 
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
