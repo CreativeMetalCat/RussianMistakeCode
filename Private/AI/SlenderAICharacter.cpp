@@ -27,6 +27,8 @@ void ASlenderAICharacter::BeginPlay()
 	GetWorldTimerManager().SetTimer(TeleportUpdateTimer, this, &ASlenderAICharacter::TeleportAround , 0.01f, true);
 
 	GetWorldTimerManager().SetTimer(SenseUpdateTimerHandle, this, &ASlenderAICharacter::UpdateSense, 0.1f, true);
+
+	GetCharacterMovement()->MaxWalkSpeed = DefaultMovementSpeed;
 }
 
 // Called every frame
@@ -41,6 +43,7 @@ void ASlenderAICharacter::StartHunt_Implementation()
 	{
 		HuntingMusicInstance = UFMODBlueprintStatics::PlayEventAtLocation(GetWorld(), HuntingMusic, GetActorTransform(), true);
 	}
+	GetCharacterMovement()->MaxWalkSpeed = HuntingMovementSpeed;
 	IsHunting = true;
 }
 
@@ -79,6 +82,17 @@ AActor* ASlenderAICharacter::GetClosestTargetOnAllMap_Implementation(TSubclassOf
 	}
 }
 
+void ASlenderAICharacter::StopHunt_Implementation()
+{
+	if (HuntingMusicInstance.Instance->isValid())
+	{
+		HuntingMusicInstance.Instance->stop(FMOD_STUDIO_STOP_MODE::FMOD_STUDIO_STOP_ALLOWFADEOUT);
+	}
+	WasLookedAtFor = 0;
+	GetCharacterMovement()->MaxWalkSpeed = DefaultMovementSpeed;
+	IsHunting = false;
+}
+
 // Called to bind functionality to input
 void ASlenderAICharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
@@ -107,6 +121,7 @@ void ASlenderAICharacter::UpdateSight_Implementation(UAIPerceptionComponent* Per
 					}
 				}
 				UAIBlueprintHelperLibrary::GetBlackboard(this)->ClearValue("Player");
+				StopHunt();
 			}
 			//can't see anymore or haven't seen yet
 			if (EnemyClasses.Num() > 0)
@@ -121,6 +136,7 @@ void ASlenderAICharacter::UpdateSight_Implementation(UAIPerceptionComponent* Per
 							{
 								UAIBlueprintHelperLibrary::GetBlackboard(this)->SetValueAsObject("Player", actors[i]);
 								UAIBlueprintHelperLibrary::GetBlackboard(this)->SetValueAsBool("CanSeeTarget", true);
+								StartHunt();
 								return;
 							}
 						}
@@ -212,11 +228,13 @@ void ASlenderAICharacter::ShouldStartHunt_Implementation()
 void ASlenderAICharacter::AttackPlayer(ACharacter* player)
 {
 	IAIInterface::Execute_DisableControl(player,true,true);
-	if (AttackSound != nullptr)
+
+	if (AttackSound->IsValidLowLevel())
 	{
-		UGameplayStatics::PlaySoundAtLocation(GetWorld(), AttackSound, GetActorLocation());
+		AttackSoundInstance = UFMODBlueprintStatics::PlayEventAtLocation(GetWorld(), HuntingMusic, GetActorTransform(), true);
 	}
 	player->SetActorRotation(UKismetMathLibrary::FindLookAtRotation(player->GetActorLocation(), GetActorLocation()));
+	StopHunt();
 	
 	IAIInterface::Execute_BeKilled(player);
 }
@@ -259,9 +277,10 @@ void ASlenderAICharacter::TeleportAround_Implementation()
 					}
 				}
 			}
-			if (TeleportSound != nullptr)
+
+			if (TeleportSound->IsValidLowLevel())
 			{
-				UGameplayStatics::PlaySoundAtLocation(GetWorld(), TeleportSound, GetActorLocation());
+				TeleportSoundInstance = UFMODBlueprintStatics::PlayEventAtLocation(GetWorld(), HuntingMusic, GetActorTransform(), true);
 			}
 		}
 	}
@@ -288,5 +307,11 @@ void ASlenderAICharacter::GetLifetimeReplicatedProps(TArray< FLifetimeProperty >
 
 	DOREPLIFETIME(ASlenderAICharacter, PatrolPoints);
 	DOREPLIFETIME(ASlenderAICharacter, PatrolNodeId);
+
+	DOREPLIFETIME(ASlenderAICharacter, TeleportSoundInstance);
+	DOREPLIFETIME(ASlenderAICharacter, AttackSoundInstance);
+
+	DOREPLIFETIME(ASlenderAICharacter, HuntingMovementSpeed);
+	DOREPLIFETIME(ASlenderAICharacter, DefaultMovementSpeed);
 	
 }
