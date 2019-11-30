@@ -87,6 +87,13 @@ public:
 	UFUNCTION(BlueprintCallable)
 		void AttackPlayer(ACharacter* player);
 
+	
+
+	UFUNCTION(BlueprintCallable,BlueprintNativeEvent)
+		void PlayFootstepSound();
+
+	void PlayFootstepSound_Implementation();
+
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 		float GetMaxSenseDistance();
 
@@ -105,6 +112,15 @@ public:
 
 	bool GetIsHunting_Implementation() { return IsHunting; }
 
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+		bool CheckLocation();
+
+	bool CheckLocation_Implementation();
+
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
+		void StopLookingAround();
+
+	void StopLookingAround_Implementation() {}
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 		bool GetIsDead();
@@ -115,6 +131,10 @@ public:
 		void StartHunt();
 
 	void StartHunt_Implementation();
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+		bool GetIsLookingAround();
+		bool GetIsLookingAround_Implementation(){return bIsLookingAround; }
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 		AActor* GetClosestTargetOnAllMap(TSubclassOf<AActor> targetClass);
@@ -131,6 +151,11 @@ public:
 
 	FTimerHandle TeleportUpdateTimer;
 
+	FTimerHandle FootstepUpdateTimer;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Replicated)
+	FTimerHandle LookAroundTimer;
+
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 		EAITypeEnum AIType = EAITypeEnum::EAIT_Overwatch;
 
@@ -139,6 +164,12 @@ public:
 		
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Sound)
 		FFMODEventInstance HuntingMusicInstance;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Sound)
+		UFMODEvent* HuntingMusicEnd;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Sound)
+		FFMODEventInstance HuntingMusicEndInstance;
 
 	/**Name of object to move to(player that tries to escape) in the black board*/
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Replicated)
@@ -223,6 +254,15 @@ public:
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Sound, Replicated)
 		FFMODEventInstance TeleportSoundInstance;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Sound)
+		UFMODEvent* FootstepSound;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Sound, Replicated)
+		FFMODEventInstance FootstepSoundInstance;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Replicated)
+		bool bIsLookingAround = false;
 
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;

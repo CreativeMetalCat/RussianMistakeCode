@@ -7,7 +7,7 @@
 #include "Runtime/Engine/Classes/Kismet/GameplayStatics.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "BehaviorTree/BlackboardComponent.h"
-
+#include "fmod_errors.h"
 #include "Public/PlayerInteractions.h"
 
 
@@ -28,6 +28,8 @@ void ASlenderAICharacter::BeginPlay()
 
 	GetWorldTimerManager().SetTimer(SenseUpdateTimerHandle, this, &ASlenderAICharacter::UpdateSense, 0.1f, true);
 
+	GetWorldTimerManager().SetTimer(FootstepUpdateTimer, this, &ASlenderAICharacter::PlayFootstepSound, 0.3f, true);
+
 	GetCharacterMovement()->MaxWalkSpeed = DefaultMovementSpeed;
 }
 
@@ -37,9 +39,23 @@ void ASlenderAICharacter::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 }
 
+bool ASlenderAICharacter::CheckLocation_Implementation()
+{
+	if (GetController() != nullptr)
+	{
+		UAIBlueprintHelperLibrary::GetBlackboard(this)->ClearValue("LastKnownLocation");
+	}
+
+	GetWorldTimerManager().SetTimer(LookAroundTimer, this, &ASlenderAICharacter::StopLookingAround, 5.f, false);
+	bIsLookingAround = true;
+	return true; 
+}
+
 void ASlenderAICharacter::StartHunt_Implementation()
 {
-	if (HuntingMusic->IsValidLowLevel())
+	FMOD_STUDIO_PLAYBACK_STATE state;
+	HuntingMusicInstance.Instance->getPlaybackState(&state);
+	if (HuntingMusic->IsValidLowLevel() && state != FMOD_STUDIO_PLAYBACK_STATE::FMOD_STUDIO_PLAYBACK_PLAYING)
 	{
 		HuntingMusicInstance = UFMODBlueprintStatics::PlayEventAtLocation(GetWorld(), HuntingMusic, GetActorTransform(), true);
 	}
@@ -86,7 +102,12 @@ void ASlenderAICharacter::StopHunt_Implementation()
 {
 	if (HuntingMusicInstance.Instance->isValid())
 	{
-		HuntingMusicInstance.Instance->stop(FMOD_STUDIO_STOP_MODE::FMOD_STUDIO_STOP_ALLOWFADEOUT);
+		FMOD_RESULT res = HuntingMusicInstance.Instance->setParameterByName("Looping", 1.f);
+		if (res != FMOD_RESULT::FMOD_OK)
+		{
+			if (GEngine) { GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Red, FMOD_ErrorString(res)); }
+			HuntingMusicInstance.Instance->stop(FMOD_STUDIO_STOP_MODE::FMOD_STUDIO_STOP_ALLOWFADEOUT);
+		}
 	}
 	WasLookedAtFor = 0;
 	GetCharacterMovement()->MaxWalkSpeed = DefaultMovementSpeed;
@@ -143,10 +164,14 @@ void ASlenderAICharacter::UpdateSight_Implementation(UAIPerceptionComponent* Per
 					}
 				}
 			}
+			UAIBlueprintHelperLibrary::GetBlackboard(this)->ClearValue("Player");
 			UAIBlueprintHelperLibrary::GetBlackboard(this)->SetValueAsBool("CanSeeTarget", false);
 
 		}
 	}
+	UAIBlueprintHelperLibrary::GetBlackboard(this)->ClearValue("Player");
+	UAIBlueprintHelperLibrary::GetBlackboard(this)->SetValueAsBool("CanSeeTarget", false);
+	
 }
 
 AActor* ASlenderAICharacter::GetClosestTarget_Implementation(TSubclassOf<AActor> targetClass, float maxDistance = 2000, float minDistance = 0)
@@ -231,12 +256,23 @@ void ASlenderAICharacter::AttackPlayer(ACharacter* player)
 
 	if (AttackSound->IsValidLowLevel())
 	{
-		AttackSoundInstance = UFMODBlueprintStatics::PlayEventAtLocation(GetWorld(), HuntingMusic, GetActorTransform(), true);
+		AttackSoundInstance = UFMODBlueprintStatics::PlayEventAtLocation(GetWorld(), AttackSound, GetActorTransform(), true);
 	}
 	player->SetActorRotation(UKismetMathLibrary::FindLookAtRotation(player->GetActorLocation(), GetActorLocation()));
 	StopHunt();
 	
 	IAIInterface::Execute_BeKilled(player);
+}
+
+void ASlenderAICharacter::PlayFootstepSound_Implementation()
+{
+	if (GetVelocity().Size() > 50)
+	{
+		if (FootstepSound->IsValidLowLevel())
+		{
+			FootstepSoundInstance = UFMODBlueprintStatics::PlayEventAtLocation(GetWorld(), FootstepSound, GetActorTransform(), true);
+		}
+	}
 }
 
 void ASlenderAICharacter::TeleportAround_Implementation()
@@ -280,7 +316,7 @@ void ASlenderAICharacter::TeleportAround_Implementation()
 
 			if (TeleportSound->IsValidLowLevel())
 			{
-				TeleportSoundInstance = UFMODBlueprintStatics::PlayEventAtLocation(GetWorld(), HuntingMusic, GetActorTransform(), true);
+				TeleportSoundInstance = UFMODBlueprintStatics::PlayEventAtLocation(GetWorld(), TeleportSound, GetActorTransform(), true);
 			}
 		}
 	}
@@ -313,5 +349,8 @@ void ASlenderAICharacter::GetLifetimeReplicatedProps(TArray< FLifetimeProperty >
 
 	DOREPLIFETIME(ASlenderAICharacter, HuntingMovementSpeed);
 	DOREPLIFETIME(ASlenderAICharacter, DefaultMovementSpeed);
+
+	DOREPLIFETIME(ASlenderAICharacter, bIsLookingAround);
+	DOREPLIFETIME(ASlenderAICharacter, LookAroundTimer);
 	
 }

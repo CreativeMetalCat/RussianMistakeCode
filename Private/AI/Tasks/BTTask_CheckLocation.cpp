@@ -7,6 +7,7 @@
 #include "AI/AIInterface.h"
 #include "SlenderCharacter.h"
 #include "Public/AI/SlenderAICharacter.h"
+#include "Engine.h"
 #include "BehaviorTree/BlackboardComponent.h"
 
 EBTNodeResult::Type UBTTask_CheckLocation::ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory)
@@ -15,11 +16,15 @@ EBTNodeResult::Type UBTTask_CheckLocation::ExecuteTask(UBehaviorTreeComponent& O
 	{
 		if (OwnerComp.GetAIOwner()->GetPawn() != nullptr)
 		{
+
+			
 			IAIInterface::Execute_CheckLocation(OwnerComp.GetAIOwner()->GetPawn());
 			OwnerComp.GetBlackboardComponent()->ClearValue(LocationKey.SelectedKeyName);
 			return EBTNodeResult::Succeeded;
 		}
+		
 		return EBTNodeResult::Failed;
 	}
+	
 	return EBTNodeResult::Failed;
 }
