@@ -221,30 +221,33 @@ void ASlenderAICharacter::UpdateTarget()
 
 void ASlenderAICharacter::ShouldStartHunt_Implementation()
 {
-	float DeltaTime = 0.01f;
-	if (!IsHunting)
+	if (AIType == EAITypeEnum::EAIT_Overwatch)
 	{
-		if (WasRecentlyRendered())
+		float DeltaTime = 0.01f;
+		if (!IsHunting)
 		{
-			WasLookedAtFor += DeltaTime;
-			if (WasLookedAtFor >= MaxLookAtTime)
+			if (WasRecentlyRendered())
 			{
-				StartHunt();
-				WasLookedAtFor = 0.0f;
+				WasLookedAtFor += DeltaTime;
+				if (WasLookedAtFor >= MaxLookAtTime)
+				{
+					StartHunt();
+					WasLookedAtFor = 0.0f;
+				}
 			}
-		}
-		else
-		{
-			WasLookedAtFor -= DeltaTime;
-			if (WasLookedAtFor < 0) { WasLookedAtFor = 0; }
-		}
+			else
+			{
+				WasLookedAtFor -= DeltaTime;
+				if (WasLookedAtFor < 0) { WasLookedAtFor = 0; }
+			}
 
 
-		//slender is supposed to be allowed to move only after first note is collected by default
-		if (bAllowedToMove)
-		{
-			TimeSinceLastNoteCollection += DeltaTime;
-			if (TimeSinceLastNoteCollection >= MaxTimeForCollectingNotes) { StartHunt(); }
+			//slender is supposed to be allowed to move only after first note is collected by default
+			if (bAllowedToMove)
+			{
+				TimeSinceLastNoteCollection += DeltaTime;
+				if (TimeSinceLastNoteCollection >= MaxTimeForCollectingNotes) { StartHunt(); }
+			}
 		}
 	}
 }

@@ -188,6 +188,27 @@ public:
 
 	float GetDangerLevel_Implementation();
 
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+		bool HasKeyId(int Id);
+
+	bool HasKeyId_Implementation(int Id);
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+		bool AddKeyId(int Id, FName name);
+
+	bool AddKeyId_Implementation(int Id, FName name);
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+		TArray<int> GetAllKeyIds();
+
+	TArray<int> GetAllKeyIds_Implementation();
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+		void TakeAwayKey(int keyId);
+
+	void TakeAwayKey_Implementation(int keyId);
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Flashlight, Replicated)
 	FTimerHandle FlashLightUpdateTimer;
 
@@ -257,6 +278,9 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite,Category=Sound)
 		USoundBase* OutOfBreathSound;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		TMap<int, FName> Keys;
 
 	/**How much did player already collected
 */

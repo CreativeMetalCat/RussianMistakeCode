@@ -608,6 +608,42 @@ float ASlenderCharacter::GetDangerLevel_Implementation()
 	}
 }
 
+bool ASlenderCharacter::HasKeyId_Implementation(int Id)
+{
+	TArray<int> keys; 
+	Keys.GetKeys(keys);
+	if (keys.Num() > 0) 
+	{
+		for (int i = 0; i < keys.Num(); i++)
+		{
+			if (keys[i] == Id) { return true; }
+		}
+	}
+	return false;
+}
+
+bool ASlenderCharacter::AddKeyId_Implementation(int Id, FName name)
+{
+	if (Keys.Find(Id) != nullptr) { return false; }
+	else
+	{
+		Keys.Add(Id, name);
+		return true;
+	}
+}
+
+TArray<int> ASlenderCharacter::GetAllKeyIds_Implementation()
+{
+	TArray<int> keys;
+	Keys.GetKeys(keys);
+	return keys;
+}
+
+void ASlenderCharacter::TakeAwayKey_Implementation(int keyId)
+{
+	if (Keys.Find(keyId) != nullptr) { Keys.Remove(keyId); }
+}
+
 void ASlenderCharacter::GetLifetimeReplicatedProps(TArray< FLifetimeProperty >& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
