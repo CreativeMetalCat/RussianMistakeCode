@@ -29,5 +29,15 @@ public:
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 		bool RequestPlayfootstepSound();
 
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+		bool HasKeyId(int Id);
 
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+		bool AddKeyId(int Id,FName name);
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+		TArray<int> GetAllKeyIds();
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+		void TakeAwayKey(int keyId);
 };
