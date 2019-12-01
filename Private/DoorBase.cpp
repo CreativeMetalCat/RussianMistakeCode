@@ -3,6 +3,7 @@
 
 #include "DoorBase.h"
 #include "Public/InteractionInterface.h"
+#include "Engine.h"
 
 void ADoorBase::OnInteraction_Implementation(AActor* interactor, UPrimitiveComponent* interactedComponent)
 {
@@ -31,10 +32,12 @@ void ADoorBase::OnInteraction_Implementation(AActor* interactor, UPrimitiveCompo
 		else
 		{
 			auto keys = Execute_GetAllKeyIds(interactor);
+			
 			if (keys.Num() > 0)
 			{
 				for (int i = 0; i < keys.Num(); i++)
 				{
+					
 					if (keys[i] == RequiredKeyId)
 					{
 						if (bTakesAwayKey)
