@@ -21,6 +21,10 @@ void AHiddingPlaceBase::OnInteraction_Implementation(AActor* interactor, UPrimit
 			IPlayerInteractions::Execute_ForceCrouch(interactor);
 			FCameraLimitsInfo info = IPlayerInteractions::Execute_GetCameraLimitations(interactor);
 			info.bSupposedToLimit = true;
+			info.MaxRoll = 180 + GetActorRotation().Roll;
+			info.MinRoll = -180 + GetActorRotation().Roll;
+			info.MaxYaw = -180 - GetActorRotation().Yaw;
+			info.MinYaw = 0 - GetActorRotation().Yaw;
 			IPlayerInteractions::Execute_SetCameraLimitations(interactor, info);
 			IPlayerInteractions::Execute_SetIsHidding(interactor, true);
 
@@ -33,6 +37,11 @@ void AHiddingPlaceBase::OnInteraction_Implementation(AActor* interactor, UPrimit
 			IPlayerInteractions::Execute_ForceUnCrouch(interactor);
 			FCameraLimitsInfo info = IPlayerInteractions::Execute_GetCameraLimitations(interactor);
 			info.bSupposedToLimit = false;
+			info.MaxRoll = 180;
+			info.MinRoll = -180;
+			info.MaxYaw = -180;
+			info.MinYaw = 0;
+
 			IPlayerInteractions::Execute_SetCameraLimitations(interactor, info);
 			IPlayerInteractions::Execute_SetIsHidding(interactor, false);
 			if (Cast<UCharacterMovementComponent>(Cast<ACharacter>(interactor)->GetMovementComponent()) != nullptr)
