@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "UObject/Interface.h"
+#include "Public/DoorKeyInfo.h"
 #include "InteractionInterface.generated.h"
 
 // This class does not need to be modified.
@@ -33,7 +34,7 @@ public:
 		bool HasKeyId(int Id);
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
-		bool AddKeyId(int Id,FName name);
+		bool AddKeyId(int Id, FDoorKeyInfo info);
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 		TArray<int> GetAllKeyIds();

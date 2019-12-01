@@ -6,6 +6,7 @@
 #include "GameFramework/Actor.h"
 #include "Public/InteractionInterface.h"
 #include "UnrealNetwork.h"
+
 #include "InteractiveActor.generated.h"
 
 

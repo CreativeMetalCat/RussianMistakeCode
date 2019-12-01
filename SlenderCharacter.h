@@ -12,6 +12,7 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "Public/PlayerInteractions.h"
 #include "Public/CameraLimitsInfo.h"
+#include "Public/DoorKeyInfo.h"
 #include "SlenderCharacter.generated.h"
 
 
@@ -195,9 +196,9 @@ public:
 	bool HasKeyId_Implementation(int Id);
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
-		bool AddKeyId(int Id, FName name);
+		bool AddKeyId(int Id, FDoorKeyInfo info);
 
-	bool AddKeyId_Implementation(int Id, FName name);
+	bool AddKeyId_Implementation(int Id, FDoorKeyInfo info);
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 		TArray<int> GetAllKeyIds();
@@ -280,7 +281,7 @@ public:
 		USoundBase* OutOfBreathSound;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		TMap<int, FName> Keys;
+		TMap<int, FDoorKeyInfo> Keys;
 
 	/**How much did player already collected
 */

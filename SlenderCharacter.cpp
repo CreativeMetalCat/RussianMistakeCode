@@ -622,12 +622,12 @@ bool ASlenderCharacter::HasKeyId_Implementation(int Id)
 	return false;
 }
 
-bool ASlenderCharacter::AddKeyId_Implementation(int Id, FName name)
+bool ASlenderCharacter::AddKeyId_Implementation(int Id, FDoorKeyInfo info)
 {
 	if (Keys.Find(Id) != nullptr) { return false; }
 	else
 	{
-		Keys.Add(Id, name);
+		Keys.Add(Id, info);
 		return true;
 	}
 }
