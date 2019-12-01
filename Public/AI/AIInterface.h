@@ -63,6 +63,9 @@ public:
 		bool CheckLocation();
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+		bool GetIsLookingAround();
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 		float GetMaxSenseDistance();
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
